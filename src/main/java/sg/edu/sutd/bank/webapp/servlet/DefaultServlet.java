@@ -87,6 +87,6 @@ public class DefaultServlet extends HttpServlet {
 	}
 	
 	protected String getRedirectPath(String template) {
-		return "/sutdbank" + template;
+		return "/SUTDBankWebApp" + template;
 	}
 }

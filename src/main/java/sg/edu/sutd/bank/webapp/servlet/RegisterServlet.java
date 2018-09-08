@@ -36,11 +36,9 @@ import sg.edu.sutd.bank.webapp.service.UserDAO;
 import sg.edu.sutd.bank.webapp.service.UserDAOImpl;
 import sg.edu.sutd.bank.webapp.service.UserRoleDAO;
 import sg.edu.sutd.bank.webapp.service.UserRoleDAOImpl;
-import sg.edu.sutd.bank.webapp.service.XSSCompliant;
+import sg.edu.sutd.bank.webapp.commons.XSSFinder;
 
-/**
- * @author SUTD
- */
+
 @WebServlet("/register")
 public class RegisterServlet extends DefaultServlet {
 	private static final long serialVersionUID = 1L;
@@ -55,15 +53,15 @@ public class RegisterServlet extends DefaultServlet {
 		ClientInfo clientAccount = new ClientInfo();
 		
 		try {
-			String fullName = XSSCompliant.getInstance().convertXSSComplianceString(request.getParameter("fullName"));
-			String fin = XSSCompliant.getInstance().convertXSSComplianceString(request.getParameter("fin"));
-			String dateOfBirth = XSSCompliant.getInstance().convertXSSComplianceString(request.getParameter("dateOfBirth"));
-			String occupation = XSSCompliant.getInstance().convertXSSComplianceString(request.getParameter("occupation"));
-			String mobileNumber = XSSCompliant.getInstance().convertXSSComplianceString(request.getParameter("mobileNumber"));
-			String address = XSSCompliant.getInstance().convertXSSComplianceString(request.getParameter("address"));
-			String email = XSSCompliant.getInstance().convertXSSComplianceString(request.getParameter("email"));
-			String username = XSSCompliant.getInstance().convertXSSComplianceString(request.getParameter("username"));
-			String password = XSSCompliant.getInstance().convertXSSComplianceString(request.getParameter("password"));
+			String fullName = XSSFinder.check_string(request.getParameter("fullName"));
+			String fin = XSSFinder.check_string(request.getParameter("fin"));
+			String dateOfBirth = XSSFinder.check_string(request.getParameter("dateOfBirth"));
+			String occupation = XSSFinder.check_string(request.getParameter("occupation"));
+			String mobileNumber = XSSFinder.check_string(request.getParameter("mobileNumber"));
+			String address = XSSFinder.check_string(request.getParameter("address"));
+			String email = XSSFinder.check_string(request.getParameter("email"));
+			String username = XSSFinder.check_string(request.getParameter("username"));
+			String password = XSSFinder.check_string(request.getParameter("password"));
 			
 			clientAccount.setFullName(fullName);
 			clientAccount.setFin(fin);
@@ -90,7 +88,7 @@ public class RegisterServlet extends DefaultServlet {
 			sendError(request, e.getMessage());
 			forward(request, response);
 		} catch(IOException e1) {
-			sendError(request, "Invalid Input.");
+			sendError(request, e1.getMessage());
 			forward(request, response);
 		}
 	}

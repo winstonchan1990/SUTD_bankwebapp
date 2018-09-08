@@ -44,12 +44,9 @@ public class ClientTransactionDAOImpl extends AbstractDAOImpl implements ClientT
 			ps.setInt(idx++, clientTransaction.getUser().getId());
 			executeInsert(clientTransaction, ps);
 			
-			// fixed CID 214529
 			ps.close();
-			// fixed CID 214522
 			conn.close();
 		} catch (SQLException e) {
-			// fixed CID 214529
 			if (ps != null) {
 				try {
 					ps.close();
@@ -57,7 +54,7 @@ public class ClientTransactionDAOImpl extends AbstractDAOImpl implements ClientT
 					throw ServiceException.wrap(e1);
 				}
 			}
-			// fixed CID 214522
+			
 			try {
 				conn.close();
 			} catch (SQLException e1) {

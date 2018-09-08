@@ -14,7 +14,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import sg.edu.sutd.bank.webapp.commons.XssHelper;
+import sg.edu.sutd.bank.webapp.commons.XSSFinder;
 import sg.edu.sutd.bank.webapp.commons.ServiceException;
 import sg.edu.sutd.bank.webapp.model.ClientInfo;
 import sg.edu.sutd.bank.webapp.model.ClientTransaction;
@@ -68,30 +68,26 @@ public class FileUploader extends DefaultServlet{
                     }
                 } else {
                 	
-//                	The file type is limited to .txt and the size of the file must be below 1024 bytes. 
-//                	This is to prevent any possible injection attack and this serves as the first layer of defense mechanism.
-                	
+                    // File type is .csv and the size of the file must be below 1MB 
+               	
                     if (fileItem.getSize() > 0 && fileItem.getSize() < 1024) {
-                        if (!fileItem.getName().contains(".txt")) {
-                            throw new Exception("Wrong Format");
+                        if (!fileItem.getName().contains(".csv")) {
+                            throw new Exception("Please upload csv format");
                         }
 
-                        String path = "/Users/limxuanping/eclipse-workspace/apache-tomcat-8.0.32/data/";
+                        // cache user inputs
+                        String path = "/home/winston/web/apache-tomcat-8.0.33/temp/";
                         fileItem.write(new File(path + fileItem.getName()));
 
                         try(BufferedReader br = new BufferedReader(new FileReader(path + fileItem.getName()))) {
                             String line;
                             
-//                            This snippet sanitises the user inputs for probable malicious attacks.
+                            // Check for potential XSS attacks
                             while ((line = br.readLine()) != null) {
                                 String[] tokens = line.split(" ");
                                 for (int i=0; i < tokens.length; i++) {
-                                    tokens[i] = XssHelper.input_normalizer(tokens[i]);
+                                    tokens[i] = XSSFinder.check_string(tokens[i]);
                                     System.out.println(tokens[i]);
-                                    if (XssHelper.xss_match(tokens[i])) {
-                                        System.out.println(tokens[i]);
-                                        throw new ServerException("XSS Attempt!");
-                                    }
                                 }
                                 try {
 
@@ -106,10 +102,13 @@ public class FileUploader extends DefaultServlet{
                                     clientTransaction.setToAccountNum(tokens[2]);
 
 
-                                    if (transactionCodesDAO.validCode(tokens[0],clientInfo.getUser().getId()) && clientTransactionDAO.validTransaction(clientTransaction)) {
+                                    if (transactionCodesDAO.validCode(tokens[0],clientInfo.getUser().getId()) && 
+                                    	clientTransactionDAO.validTransaction(clientTransaction)) {
+                                    	
                                         transactionCodesDAO.updateUsage(tokens[0], clientInfo.getUser().getId());
                                         clientTransactionDAO.create(clientTransaction);
                                     }
+                                    
                                 } catch (ServiceException e) {
                                     sendError(request, e.getMessage());
                                     forward(request, response);
@@ -122,7 +121,6 @@ public class FileUploader extends DefaultServlet{
                         }
                     } else {
                         throw new ServerException("File Format Incorrect or Exceeded Allowed Size");
-
                     }
                 }
             }

@@ -75,7 +75,8 @@ public class LoginServlet extends DefaultServlet {
 			}
 			sendError(req, "Invalid username/password!");
 		} catch(ServletException | ServiceException ex) {
-			sendError(req, ex.getMessage());
+			//sendError(req, ex.getMessage());
+			sendError(req, "Invalid username/password!");
 		}
 		forward(req, resp);
 	}

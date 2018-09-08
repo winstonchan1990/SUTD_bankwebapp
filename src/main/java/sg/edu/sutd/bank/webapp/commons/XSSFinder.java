@@ -1,30 +1,30 @@
 package sg.edu.sutd.bank.webapp.commons;
 
+import java.io.IOException;
 import java.text.Normalizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//This is a common XssHelper class that scans user inputs for malicious cross-site scripting attacks
-//anywhere a user input is used
-
-public class XssHelper {
+public class XSSFinder {
     private static final long serialVersionUID = 1L;
 
-    private XssHelper() {}
+    private XSSFinder() {}
 
-//  Normalises the string by removing non-ASCII characters
-//  This helps to prevent injection attacks by limiting the scope of what character is allowed.
-    
-    public static String input_normalizer(String input) {
-        input = Normalizer.normalize(input, Normalizer.Form.NFKC);
-        return input.replaceAll("[^\\p{ASCII}]", "");
-    }
-
-//    Scans the string for presence of the "<script>" tag
-    public static Boolean xss_match(String input) {
+   
+    // Check string for presence of the "<script>" tag
+    public static String check_string(String input) throws IOException {
+    	
+    	String processed_input = input;
+    	processed_input = Normalizer.normalize(input, Normalizer.Form.NFKC);
+    	processed_input = processed_input.replaceAll("[^\\p{ASCII}]", "");
+    	
         Pattern pattern = Pattern.compile("<script>");
-        Matcher matcher = pattern.matcher(input);
-        return matcher.find();
+        Matcher matcher = pattern.matcher(processed_input);
+        if(matcher.find()) {
+        	throw new IOException("Warning: Potential XSS Attack found!");
+        }
+        
+        return input;
     }
 
 
