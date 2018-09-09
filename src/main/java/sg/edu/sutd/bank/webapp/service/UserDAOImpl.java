@@ -27,7 +27,7 @@ import sg.edu.sutd.bank.webapp.model.User;
 public class UserDAOImpl extends AbstractDAOImpl implements UserDAO {
 
 	@Override
-	public User loadUser(String userName) throws ServiceException {
+	public synchronized User loadUser(String userName) throws ServiceException {
 		Connection conn = connectDB();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -51,7 +51,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public void create(User user) throws ServiceException {
+	public synchronized void create(User user) throws ServiceException {
 		Connection conn = connectDB();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -68,16 +68,7 @@ public class UserDAOImpl extends AbstractDAOImpl implements UserDAO {
 		}
 	}
 
-	/**
-	 * UPDATE config
-		   SET config_value = CASE config_name 
-		                      WHEN 'name1' THEN 'value' 
-		                      WHEN 'name2' THEN 'value2' 
-		                      ELSE config_value
-		                      END
-		 WHERE config_name IN('name1', 'name2');
-	 * @throws ServiceException 
-	 */
+
 	@Override
 	public void updateDecision(List<User> users) throws ServiceException {
 		StringBuilder query = new StringBuilder("UPDATE user SET status = Case id ");

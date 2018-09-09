@@ -34,5 +34,7 @@ public interface ClientTransactionDAO {
 
 	void updateDecision(ClientTransaction transactions) throws ServiceException;
 	
-	Boolean validTransaction(ClientTransaction transaction) throws  ServiceException;
+	Boolean isPositiveValue(ClientTransaction transaction) throws ServiceException;
+	
+	Boolean hasSufficientBalance(ClientTransaction transaction) throws  ServiceException;
 }

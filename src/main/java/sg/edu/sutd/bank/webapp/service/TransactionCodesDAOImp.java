@@ -26,7 +26,7 @@ import sg.edu.sutd.bank.webapp.commons.ServiceException;
 public class TransactionCodesDAOImp extends AbstractDAOImpl implements TransactionCodesDAO {
 
 	@Override
-	public void create(List<String> codes, int userId) throws ServiceException {
+	public synchronized void create(List<String> codes, int userId) throws ServiceException {
 		Connection conn = connectDB();
 		PreparedStatement ps = null;
 		try {
@@ -51,12 +51,10 @@ public class TransactionCodesDAOImp extends AbstractDAOImpl implements Transacti
 				throw new SQLException("Update failed, no rows affected!");
 			}
 			
-			// fixed CID 24528
+
 			ps.close();
-			// fixed CID 245532
 			conn.close();
 		} catch (SQLException e) {
-			// fixed CID 24528
 			if (ps != null) {
 				try {
 					ps.close();
@@ -64,7 +62,7 @@ public class TransactionCodesDAOImp extends AbstractDAOImpl implements Transacti
 					throw ServiceException.wrap(e1);
 				}
 			}
-			// fixed CID 245532
+			
 			try {
 				conn.close();
 			} catch (SQLException e1) {
@@ -109,7 +107,7 @@ public class TransactionCodesDAOImp extends AbstractDAOImpl implements Transacti
 		return result;
 	}
 	
-	public void updateTxnCodeStatus(String codes, int userId, Boolean status) throws ServiceException {
+	public synchronized void updateTxnCodeStatus(String codes, int userId, Boolean status) throws ServiceException {
 		Connection conn = connectDB();
 		PreparedStatement ps = null;
 		String updateStmt = "UPDATE transaction_code SET used = ? WHERE user_id = ? and code = ?";
@@ -123,12 +121,11 @@ public class TransactionCodesDAOImp extends AbstractDAOImpl implements Transacti
 			
 			ps.executeUpdate();
 			
-			// fixed CID 272829
 			ps.close();
-			// fixed CID 272826
+
 			conn.close();
 		} catch (SQLException e) {
-			// fixed CID 272829
+
 			if (ps != null) {
 				try {
 					ps.close();
@@ -136,7 +133,7 @@ public class TransactionCodesDAOImp extends AbstractDAOImpl implements Transacti
 					throw ServiceException.wrap(e1);
 				}
 			}
-			// fixed CID 272826
+
 			try {
 				conn.close();
 			} catch (SQLException e1) {
@@ -167,7 +164,7 @@ public class TransactionCodesDAOImp extends AbstractDAOImpl implements Transacti
 	}
 
 	@Override
-	public Boolean validCode(String code, int userId) throws ServiceException {
+	public synchronized Boolean validCode(String code, int userId) throws ServiceException {
 		Connection conn = connectDB();
 		PreparedStatement ps = null;
 		ResultSet rs = null;

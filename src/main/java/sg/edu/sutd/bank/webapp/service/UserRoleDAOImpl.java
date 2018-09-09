@@ -27,7 +27,7 @@ public class UserRoleDAOImpl extends AbstractDAOImpl implements UserRoleDAO {
 
 
 	@Override
-	public void create(UserRole userRole) throws ServiceException {
+	public synchronized void create(UserRole userRole) throws ServiceException {
 		Connection conn = connectDB();
 		PreparedStatement ps = null;
 		ResultSet rs = null;

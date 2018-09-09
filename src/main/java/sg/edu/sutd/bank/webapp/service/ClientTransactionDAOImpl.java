@@ -31,7 +31,7 @@ import sg.edu.sutd.bank.webapp.model.User;
 public class ClientTransactionDAOImpl extends AbstractDAOImpl implements ClientTransactionDAO {
 
 	@Override
-	public void create(ClientTransaction clientTransaction) throws ServiceException {
+	public synchronized void create(ClientTransaction clientTransaction) throws ServiceException {
 		Connection conn = connectDB();
 		PreparedStatement ps = null;
 		try {
@@ -65,7 +65,7 @@ public class ClientTransactionDAOImpl extends AbstractDAOImpl implements ClientT
 	}
 
 	@Override
-	public List<ClientTransaction> load(User user) throws ServiceException {
+	public synchronized List<ClientTransaction> load(User user) throws ServiceException {
 		Connection conn = connectDB();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -96,7 +96,7 @@ public class ClientTransactionDAOImpl extends AbstractDAOImpl implements ClientT
 	}
 
 	@Override
-	public List<ClientTransaction> loadWaitingList() throws ServiceException {
+	public synchronized List<ClientTransaction> loadWaitingList() throws ServiceException {
 		Connection conn = connectDB();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -125,7 +125,7 @@ public class ClientTransactionDAOImpl extends AbstractDAOImpl implements ClientT
 	}
 
 	@Override
-	public void updateDecision(List<ClientTransaction> transactions) throws ServiceException {
+	public synchronized void updateDecision(List<ClientTransaction> transactions) throws ServiceException {
 		StringBuilder query = new StringBuilder("UPDATE client_transaction SET status = Case id ");
 		for (ClientTransaction trans : transactions) {
 			query.append(String.format("WHEN %d THEN '%s' ", trans.getId(), trans.getStatus().name()));
@@ -157,7 +157,7 @@ public class ClientTransactionDAOImpl extends AbstractDAOImpl implements ClientT
 	}
 	
 	@Override
-	public void updateDecision(ClientTransaction trans) throws ServiceException {
+	public synchronized void updateDecision(ClientTransaction trans) throws ServiceException {
 		StringBuilder query = new StringBuilder("UPDATE client_transaction SET status = Case id ");
 		query.append(String.format("WHEN %d THEN '%s' ", trans.getId(), trans.getStatus().name()));
 		
@@ -185,7 +185,12 @@ public class ClientTransactionDAOImpl extends AbstractDAOImpl implements ClientT
 	}
 	
 	@Override
-    public synchronized Boolean validTransaction(ClientTransaction transaction) throws  ServiceException {
+	public synchronized Boolean isPositiveValue(ClientTransaction transaction) throws ServiceException {
+		return transaction.getAmount().compareTo(BigDecimal.ZERO) > 0;
+	}
+	
+	@Override
+    public synchronized Boolean hasSufficientBalance(ClientTransaction transaction) throws  ServiceException {
         Connection conn = connectDB();
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -206,7 +211,6 @@ public class ClientTransactionDAOImpl extends AbstractDAOImpl implements ClientT
         } finally {
             closeDb(conn, ps, rs);
         }
-
     }
 
 }
