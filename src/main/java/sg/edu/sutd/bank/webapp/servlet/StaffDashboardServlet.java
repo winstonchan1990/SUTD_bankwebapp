@@ -14,6 +14,7 @@ https://opensource.org/licenses/ECL-2.0
  */
 
 package sg.edu.sutd.bank.webapp.servlet;
+import static sg.edu.sutd.bank.webapp.servlet.ServletPaths.LOGIN;
 import static sg.edu.sutd.bank.webapp.servlet.ServletPaths.STAFF_DASHBOARD_PAGE;
 
 import java.io.IOException;
@@ -64,29 +65,38 @@ public class StaffDashboardServlet extends DefaultServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		try {
-			List<ClientInfo> accountList = clientInfoDAO.loadWaitingList();
-			req.getSession().setAttribute("registrationList", accountList);
-			List<ClientTransaction> transList = clientTransactionDAO.loadWaitingList();
-			req.getSession().setAttribute("transList", transList);
-		} catch (ServiceException e) {
-			sendError(req, e.getMessage());
+		Boolean tmp = req.isUserInRole("staff");
+		if(!tmp) {
+			redirect(resp,LOGIN);
+		} else {
+			try {
+				List<ClientInfo> accountList = clientInfoDAO.loadWaitingList();
+				req.getSession().setAttribute("registrationList", accountList);
+				List<ClientTransaction> transList = clientTransactionDAO.loadWaitingList();
+				req.getSession().setAttribute("transList", transList);
+			} catch (ServiceException e) {
+				sendError(req, e.getMessage());
+			}
+			forward(req, resp);
 		}
-		forward(req, resp);
 	}
 	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String actionType = req.getParameter("actionType");
-		if (REGISTRATION_DECISION_ACTION.endsWith(actionType)) {
-			try {
-				onRegistrationDecisionAction(req, resp);
-			} catch (ServiceException e) {
-				sendError(req, e.getMessage());
-				redirect(resp, STAFF_DASHBOARD_PAGE);
+		if(!req.isUserInRole("staff")) {
+			redirect(resp,LOGIN);
+		} else {
+			String actionType = req.getParameter("actionType");
+			if (REGISTRATION_DECISION_ACTION.endsWith(actionType)) {
+				try {
+					onRegistrationDecisionAction(req, resp);
+				} catch (ServiceException e) {
+					sendError(req, e.getMessage());
+					redirect(resp, STAFF_DASHBOARD_PAGE);
+				}
+			} else if (TRANSACTION_DECSION_ACTION.equals(actionType)) {
+				onTransactionDecisionAction(req, resp);
 			}
-		} else if (TRANSACTION_DECSION_ACTION.equals(actionType)) {
-			onTransactionDecisionAction(req, resp);
 		}
 	}
 
