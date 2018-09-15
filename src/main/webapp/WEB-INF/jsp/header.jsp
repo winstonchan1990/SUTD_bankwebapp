@@ -11,8 +11,13 @@
 	            <span class="icon-bar"></span>
 	            <span class="icon-bar"></span>
 	          </button>
-	          <a class="navbar-brand" href="#"><img alt="SUTD Logo" src="<c:url value="/resources/img/sutd-logo.png" />"></a>
-	        </div>
+				<a class="navbar-brand" href="#">
+				<img alt="SUTD Logo"
+					 class="img-circle"
+					 style="height:100%;"
+					 src="<c:url value="/resources/img/newlogo.jpeg" />">
+				</a>
+			</div>
 	        <div id="navbar" class="collapse navbar-collapse">
 	          <ul class="nav navbar-nav">
 	            <c:if test="${empty sessionScope.authenticatedUser}">
@@ -21,6 +26,12 @@
             	 	<li><a href="register">Register</a></li>
 	            </c:if>
 	            <c:if test="${not empty sessionScope.authenticatedUser}">
+	            	<c:if test="${sessionScope.roleUser == 'staff'}">
+	            	<li><a href="staffDashboard">Staff Dashboard</a></li>
+	            	</c:if>
+	            	<c:if test="${sessionScope.roleUser == 'client'}">
+	            	<li><a href="clientDashboard">Client Dashboard</a></li>
+	            	</c:if>
 	            	<li><a href="logout">Logout</a></li>
 	            </c:if>
 	          </ul>

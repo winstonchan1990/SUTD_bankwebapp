@@ -38,7 +38,12 @@
 	            <span class="icon-bar"></span>
 	            <span class="icon-bar"></span>
 	          </button>
-	          <a class="navbar-brand" href="welcome"><img alt="SUTD Logo" src="<c:url value="/resources/img/sutd-logo.png" />"></a>
+	          <a class="navbar-brand" href="welcome">
+	          <img alt="SUTD Logo"
+					 class="img-circle"
+					 style="height:100%;"
+					 src="<c:url value="/resources/img/newlogo.jpeg" />">
+	          </a>
 	        </div>
 	        <div id="navbar" class="collapse navbar-collapse">
 	          <ul class="nav navbar-nav">
@@ -64,6 +69,11 @@
 			<div class="containter loginForm">
 				<form id="loginForm" action="login" method="post">
 					<div id="messageBox" class="hidden"></div>
+					<c:if test="${not empty sessionScope.unauthorized_access_msg}">
+						<div id="errorMsg">
+							<p class="text-danger">${sessionScope.unauthorized_access_msg}</p>
+						</div>
+					</c:if>
 					<c:if test="${not empty req_error}">
 						<div id="errorMsg">
 							<p class="text-danger">${req_error}</p>
@@ -84,7 +94,19 @@
 			</div>
 		</main>
 	</c:if>
-    <!-- jQuery and line numbering JavaScript -->
+	
+	<!-- Unauthorized -->
+	<c:if test="${not empty authenticatedUser}">
+		<main class="mainContent sutd-template" role="main"> 
+			<c:if test="${not empty sessionScope.unauthorized_access_msg}">
+				<div id="errorMsg">
+					<p class="text-danger">${sessionScope.unauthorized_access_msg}</p>
+				</div>
+			</c:if> 
+		</main>
+	</c:if>
+
+	<!-- jQuery and line numbering JavaScript -->
     <script type="text/javascript" src="<c:url value="/resources/js/jquery-1.11.3.js" />"></script>
     <!-- Bootstrap core JavaScript
     ================================================== -->
