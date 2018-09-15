@@ -32,6 +32,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import sg.edu.sutd.bank.webapp.commons.ServiceException;
+import sg.edu.sutd.bank.webapp.commons.XSSFinder;
 import sg.edu.sutd.bank.webapp.model.ClientAccount;
 import sg.edu.sutd.bank.webapp.model.ClientTransaction;
 import sg.edu.sutd.bank.webapp.model.TransactionStatus;
@@ -74,8 +75,11 @@ public class NewTransactionServlet extends DefaultServlet {
 				/// SINGLE
 				if (transactionMode.equals("single")){
 					
+					// check for potential XSS attack
+					String txnCode = XSSFinder.check_string(req.getParameter("transcode"));
+					
 					clientTransaction.setAmount(new BigDecimal(req.getParameter("amount")));
-					clientTransaction.setTransCode(req.getParameter("transcode"));
+					clientTransaction.setTransCode(txnCode);
 					clientTransaction.setToAccountNum(req.getParameter("toAccountNum"));
 					clientTransaction.setStatus(null);
 					
@@ -169,9 +173,13 @@ public class NewTransactionServlet extends DefaultServlet {
 								error_incorrectnumfields_count++;
 								continue;
 							}
+							
+							// check for potential XSS attack
+							String txnCode = XSSFinder.check_string(fields[0]);
+							
 
 							clientTransaction.setAmount(new BigDecimal(fields[2]));
-							clientTransaction.setTransCode(fields[0]);
+							clientTransaction.setTransCode(txnCode);
 							clientTransaction.setToAccountNum(fields[1]);
 							clientTransaction.setStatus(null);
 							double txnAmt = clientTransaction.getAmount().doubleValue();
