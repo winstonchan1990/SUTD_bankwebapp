@@ -67,6 +67,10 @@ public class StaffDashboardServlet extends DefaultServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		Boolean tmp = req.isUserInRole("staff");
 		if(!tmp) {
+			req.getSession().setAttribute(
+				"unauthorized_access_msg", 
+				"You cannot access Staff Dashboard."
+			);
 			redirect(resp,LOGIN);
 		} else {
 			try {
@@ -84,6 +88,10 @@ public class StaffDashboardServlet extends DefaultServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		if(!req.isUserInRole("staff")) {
+			req.getSession().setAttribute(
+				"unauthorized_access_msg", 
+				"You cannot access Staff Dashboard."
+			);
 			redirect(resp,LOGIN);
 		} else {
 			String actionType = req.getParameter("actionType");

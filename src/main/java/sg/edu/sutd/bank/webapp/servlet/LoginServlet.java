@@ -67,15 +67,16 @@ public class LoginServlet extends DefaultServlet {
 				
 				setUserId(req, user.getId());
 				if (req.isUserInRole("client")) {
+					session.setAttribute("roleUser", "client");
 					redirect(resp, CLIENT_DASHBOARD_PAGE);
 				} else if (req.isUserInRole("staff")) {
+					session.setAttribute("roleUser", "staff");
 					redirect(resp, STAFF_DASHBOARD_PAGE);
 				}
 				return;
 			}
 			sendError(req, "Invalid username/password!");
 		} catch(ServletException | ServiceException ex) {
-			//sendError(req, ex.getMessage());
 			sendError(req, "Invalid username/password!");
 		}
 		forward(req, resp);

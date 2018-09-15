@@ -38,6 +38,10 @@ public class ClientDashboardServlet extends DefaultServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		if(!req.isUserInRole("client")) {
+			req.getSession().setAttribute(
+				"unauthorized_access_msg", 
+				"You cannot access Client Dashboard."
+			);
 			redirect(resp,LOGIN);
 		} else {
 			try {
