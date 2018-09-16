@@ -97,11 +97,12 @@ public class NewTransactionServlet extends DefaultServlet {
 						sendError(req, "Invalid transaction amount.");
 						forward(req, resp);
 						return;
-					}
+					}	
 					
 					if(!IsValidTransactionCode) {
 						sendError(req, "Invalid Transaction Code.");
 						forward(req, resp);
+						return;
 					}
 					
 					if(!HasSufficientBalance) {
@@ -285,8 +286,11 @@ public class NewTransactionServlet extends DefaultServlet {
 				sendError(req, e.getMessage());
 				forward(req, resp);
 			}
+		} catch (IOException e) {
+			sendError(req, e.getMessage());
+			forward(req, resp);
+		} finally {
+			AccountBalanceLock.getInstance().unlock();
 		}
-		
-		AccountBalanceLock.getInstance().unlock();
 	}
 }
