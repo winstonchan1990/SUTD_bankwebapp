@@ -153,6 +153,7 @@ public class NewTransactionServlet extends DefaultServlet {
 					String separtor = ",";
 					boolean isError = false;
 					int total_count = 0;
+					int error_xss_count = 0;
 					int error_ispositivevalue_count = 0;
 					int error_isvalidtxncode_count = 0;
 					int error_sufficientbalance_count = 0;
@@ -200,18 +201,21 @@ public class NewTransactionServlet extends DefaultServlet {
 							if (!IsPositiveValue) {
 								isError = true;
 								error_ispositivevalue_count ++;
+								total_count++;
 								continue;
 							}
 								
 							if(!IsValidTransactionCode) {
 								isError = true;
 								error_isvalidtxncode_count ++;
+								total_count++;
 								continue;
 							}
 								
 							if(!HasSufficientBalance) {
 								isError = true;
 								error_sufficientbalance_count ++;
+								total_count++;
 								continue;
 							}
 								
@@ -243,9 +247,14 @@ public class NewTransactionServlet extends DefaultServlet {
 							availableBalance -= txnAmt;
 								 
 						} catch (Exception e) {
-							// exception due to incorrect field format
 							isError = true;
-							error_format_count++;
+							if(e.getMessage().contains("Warning: Potential XSS Attack found!")) {
+								// check if Exception is due to XSS
+								error_xss_count++;
+							} else {
+								// exception due to incorrect field format
+								error_format_count++;
+							}
 						}
 						
 						total_count++;
@@ -254,12 +263,13 @@ public class NewTransactionServlet extends DefaultServlet {
 					
 					if(isError == true) {
 						String errorMsg = "Batch Mode: " + 
-							total_count + " transactions in total \n" + 
-							error_format_count + " transactions with wrong format\n" + 
-							error_incorrectnumfields_count + " transactions with incorrect no. of fields\n" + 
-							error_ispositivevalue_count +" transactions with zero / negative txn values\n" +
-							error_isvalidtxncode_count + " transactions with invalid txn codes\n" +
-							error_sufficientbalance_count + " transactions rejected due to insufficient balance\n";
+							total_count + " transactions in total <br/>" + 
+							error_xss_count + " transactions with XSS risk <br/>" +
+							error_format_count + " transactions with wrong format <br/>" + 
+							error_incorrectnumfields_count + " transactions with incorrect no. of fields <br/>" + 
+							error_ispositivevalue_count +" transactions with zero / negative txn values <br/>" +
+							error_isvalidtxncode_count + " transactions with invalid txn codes <br/>" +
+							error_sufficientbalance_count + " transactions rejected due to insufficient balance <br/>";
 						
 						sendError(req, errorMsg);
 						forward(req, resp);
